@@ -9,7 +9,7 @@ private struct HeaderFooterSectionModel: Differentiable {
         return "Section \(id)"
     }
 
-    var identifier: Int {
+    var differenceIdentifier: Int {
         return id
     }
 
@@ -33,24 +33,35 @@ final class HeaderFooterSectionViewController: UITableViewController {
         }
     }
 
+    var state = false {
+        didSet {
+            dataInput = state ? secondData : firstData
+        }
+    }
+
+    private let firstData = [
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 1, hasFooter: false), elements: ["A", "B", "C", "D"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 2, hasFooter: false), elements: ["E", "F", "G", "H", "I"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 3, hasFooter: false), elements: ["J", "K", "L", "M"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 4, hasFooter: false), elements: ["N", "O", "P", "Q"])
+    ]
+
+    private let secondData = [
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 1, hasFooter: false), elements: ["A", "B", "C", "D"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 2, hasFooter: false), elements: ["G"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 3, hasFooter: false), elements: ["E", "F", "H", "I"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 3, hasFooter: false), elements: ["J", "K", "L", "M"]),
+        HeaderFooterSection(model: HeaderFooterSectionModel(id: 4, hasFooter: false), elements: ["N", "O", "P", "Q"])
+    ]
+
     private let allTexts = (0x0041...0x005A).compactMap { UnicodeScalar($0).map(String.init) }
 
     @objc private func refresh() {
-        let model = HeaderFooterSectionModel(id: 0, hasFooter: true)
-        let section = HeaderFooterSection(model: model, elements: allTexts.prefix(7))
-        dataInput = [section]
+        state = !state
     }
 
     private func showMore(in sectionIndex: Int) {
-        var section = dataInput[sectionIndex]
-        let texts = allTexts.dropFirst(section.elements.count).prefix(7)
-        section.elements.append(contentsOf: texts)
-        section.model.hasFooter = section.elements.count < allTexts.count
-        dataInput[sectionIndex] = section
-
-        let lastIndex = section.elements.index(before: section.elements.endIndex)
-        let lastIndexPath = IndexPath(row: lastIndex, section: sectionIndex)
-        tableView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+        dataInput = secondData
     }
 
     override func viewWillAppear(_ animated: Bool) {
