@@ -106,6 +106,7 @@ public extension UITableView {
                 }
 
                 for (source, target) in changeset.elementMoved {
+                    cellForRow(at: IndexPath(row: source.element, section: source.section))?.setEditing(false, animated: true)
                     moveRow(at: IndexPath(row: source.element, section: source.section), to: IndexPath(row: target.element, section: target.section))
                 }
             }
